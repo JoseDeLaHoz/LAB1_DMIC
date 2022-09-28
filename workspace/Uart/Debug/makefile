@@ -60,8 +60,8 @@ all: main-build
 main-build: Uart.elf secondary-outputs
 
 # Tool invocations
-Uart.elf Uart.map: $(OBJS) $(USER_OBJS) C:\Users\Juan\ Reyes\Desktop\U\DMIC\LAB1\LAB1_DMIC\workspace\Uart\STM32F767ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Uart.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\Juan Reyes\Desktop\U\DMIC\LAB1\LAB1_DMIC\workspace\Uart\STM32F767ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Uart.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Uart.elf Uart.map: $(OBJS) $(USER_OBJS) C:\Users\junio\OneDrive\Documentos\JOSE\DMIC\GIT\LABS\LAB1_DMIC\workspace\Uart\STM32F767ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Uart.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\junio\OneDrive\Documentos\JOSE\DMIC\GIT\LABS\LAB1_DMIC\workspace\Uart\STM32F767ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Uart.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
