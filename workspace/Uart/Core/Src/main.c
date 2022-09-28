@@ -99,7 +99,7 @@ int main(void)
 
   uint8_t receive[16] = {0};
   uint8_t seed[16] = {0};
-  uint8_t pol[] = {0,1,1,1};
+  uint8_t pol[] = {1,0,0,1};
   uint8_t xor[16] = {0};
   uint8_t buff[4];
   uint8_t sp[]="\n\r";
