@@ -172,7 +172,7 @@ while(k<16){
 
 	  uint8_t usr =8*seed[0]+4*seed[1]+2*seed[2]+seed[3];
 
-	  itoa(usr,(char*)buff,10);
+	  itoa(usr,(char*)buff,16);
 
 
 	  HAL_UART_Transmit(&huart3, buff, sizeof(buff), HAL_MAX_DELAY);

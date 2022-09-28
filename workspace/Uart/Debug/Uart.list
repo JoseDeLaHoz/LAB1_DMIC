@@ -678,10 +678,10 @@ while(k<16){
  8000798:	4413      	add	r3, r2
  800079a:	f887 3063 	strb.w	r3, [r7, #99]	; 0x63
 
-	  itoa(usr,(char*)buff,10);
+	  itoa(usr,(char*)buff,16);
  800079e:	f897 3063 	ldrb.w	r3, [r7, #99]	; 0x63
  80007a2:	f107 0108 	add.w	r1, r7, #8
- 80007a6:	220a      	movs	r2, #10
+ 80007a6:	2210      	movs	r2, #16
  80007a8:	4618      	mov	r0, r3
  80007aa:	f002 fd33 	bl	8003214 <itoa>
 
