@@ -24,6 +24,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "retarget.h"
+#include "funciones.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -68,7 +71,8 @@ static void MX_USART3_UART_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	char nombre[20];
+	char buf[10];
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -91,14 +95,27 @@ int main(void)
   MX_GPIO_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
+  RetargetInit(&huart3);
 
   uint8_t receive[16] = {0};
   uint8_t seed[16] = {0};
-  uint8_t pol[] = {1,0,0,1};
+  uint8_t pol[] = {0,1,1,1};
   uint8_t xor[16] = {0};
   uint8_t buff[4];
   uint8_t sp[]="\n\r";
 
+  printf("\x1b[2J"); //Clear the screen
+  printf("\n\r***************************************************************");
+  printf("\n\r* Universidad Escuela Colombiana de Ingenieria Julio Garavito *");
+  printf("\n\r* DMIC - Jose De La Hoz - 2022                                *");
+  printf("\n\r* Juego 'GENERADOR SEUDO SBPA'                          *");
+  printf("\n\r* Desarrollado para una tarjeta NUCLE0-F767ZI                 *");
+  printf("\n\r***************************************************************");
+  printf("\r\n");
+  printf("\n\rPara una mejor experiencia, habilite la opcion de eco local en su terminal");
+  printf("\r\n");
+  printf("\r\nIngrese su nombre: ");
+  scanf("%s", nombre);
 
 
   /* USER CODE END 2 */
@@ -252,7 +269,7 @@ static void MX_USART3_UART_Init(void)
 
   /* USER CODE END USART3_Init 1 */
   huart3.Instance = USART3;
-  huart3.Init.BaudRate = 115200;
+  huart3.Init.BaudRate = 9600;
   huart3.Init.WordLength = UART_WORDLENGTH_8B;
   huart3.Init.StopBits = UART_STOPBITS_1;
   huart3.Init.Parity = UART_PARITY_NONE;
