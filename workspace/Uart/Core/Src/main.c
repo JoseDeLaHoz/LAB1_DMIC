@@ -115,7 +115,7 @@ int main(void)
   printf("\n\rPara una mejor experiencia, habilite la opcion de eco local en su terminal");
   printf("\r\n");
   printf("\r\nIngrese su nombre: ");
-  scanf("%s", nombre);
+  //scanf("%s", nombre);
 
 
   /* USER CODE END 2 */
