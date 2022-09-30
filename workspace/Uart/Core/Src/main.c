@@ -71,8 +71,7 @@ static void MX_USART3_UART_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	char nombre[20];
-	char buf[10];
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -96,10 +95,12 @@ int main(void)
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
   RetargetInit(&huart3);
-
+  char nombre[20];
+  char buf[10];
   uint8_t receive[16] = {0};
   uint8_t seed[16] = {0};
-  uint8_t pol[] = {1,0,0,1};
+  uint8_t pol[] = {1,0,1,0,0};
+  uint8_t aux[]={0,0,0,0,0};
   uint8_t xor[16] = {0};
   uint8_t buff[4];
   uint8_t sp[]="\n\r";
@@ -108,43 +109,52 @@ int main(void)
   printf("\n\r***************************************************************");
   printf("\n\r* Universidad Escuela Colombiana de Ingenieria Julio Garavito *");
   printf("\n\r*                    DMIC - B - 2022                          *");
-  printf("\n\r*\t Jose De La Hoz                                      *");
-  printf("\n\r*\t Jhan Carlos Reyes                                   *");
-  printf("\n\r*\t Esneider Silva                                      *");
-  printf("\n\r*\t\t'GENERADOR SEUDO SBPA'                          *");
+  printf("\n\r*\t Jose De La Hoz                                            *");
+  printf("\n\r*\t Jhan Carlos Reyes                                         *");
+  printf("\n\r*\t Esneider Silva                                            *");
+  printf("\n\r*\t\t'GENERADOR DE NUMEROS PSEUDOALEATORIO'            *");
   printf("\n\r* Desarrollado para una tarjeta NUCLE0-F767ZI                 *");
   printf("\n\r***************************************************************");
   printf("\r\n");
   printf("\n\rPara una mejor experiencia, habilite la opcion de eco local en su terminal");
   printf("\r\n");
-  //printf("\r\nIngrese su nombre: ");
-  printf("\n\rNumero de bits termino de realimentacion");
-  scanf("%s", buf);
-  int numUsuario = atoi(buf);
 
+  printf("\n\rNumero de bits termino de realimentacion\n\r");
+  scanf("%s", buf);
+  HAL_UART_Transmit(&huart3, buf, sizeof(buf), HAL_MAX_DELAY);
+  int numUsuario = atoi(buf);
+  printf ("Decimals: %d\n\r", numUsuario);
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  for(int w =0;w<=4;w++){
+  		  aux[w]=pol[4-w];
+  	  }
+
+  	  for(int w =0;w<=4;w++){
+  	  		  pol[w]=aux[w];
+  	  	  }
 
   while (1)
   {
-
-	  if(!HAL_UART_Receive(&huart3, (uint8_t*)receive,4, HAL_MAX_DELAY)){
+	  printf ("ingrese el numero en binario\n\r");
+	  if(!HAL_UART_Receive(&huart3, (uint8_t*)receive,5, HAL_MAX_DELAY)){
 
 		  for(int i=0;(i<=15);i++){
 			  seed[i]=(receive[i]-48);
 		  }
-
-		  //HAL_UART_Transmit(&huart3, seed, sizeof(seed), HAL_MAX_DELAY);
-		  //HAL_UART_Transmit(&huart3, seed, 4, HAL_MAX_DELAY);
-
 	  }
+
+
+
+
+
   //////////////////////////////////////////////////////
 int k=0;
-while(k<16){
-	  for(int i=0;(i<4);i++){
+while(k<32){
+	  for(int i=0;(i<5);i++){
 		  if(pol[i]==1){xor[i]=seed[i];}
 		  else{xor[i]=0;}
 	  }
@@ -152,7 +162,7 @@ while(k<16){
 
 /////////////////////////////////////////////////////////////////////////////////
 	  uint8_t res=0;
-	  for(int i = 0;(i<4);i++){
+	  for(int i = 0;(i<5);i++){
 		  res=res+xor[i];
 	  }
 ///////////////////////////////////////////////////////////////////////////////////
@@ -168,14 +178,14 @@ while(k<16){
 	  ///////////////////////////////////////////////
 	 // HAL_UART_Transmit(&huart3, &res, sizeof(res), HAL_MAX_DELAY);
 	  ///mover y poner el valor xor en la cabeza
-
+	  seed[4]=seed[3];
 	  seed[3]=seed[2];
 	  seed[2]=seed[1];
 	  seed[1]=seed[0];
 	  seed[0]=res;
 
 
-	  uint8_t usr =8*seed[0]+4*seed[1]+2*seed[2]+seed[3];
+	  uint8_t usr =16*seed[0]+8*seed[1]+4*seed[2]+2*seed[3]+seed[4];
 
 	  itoa(usr,(char*)buff,16);
 
