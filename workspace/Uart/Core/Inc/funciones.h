@@ -8,7 +8,7 @@
 #ifndef INC_FUNCIONES_H_
 #define INC_FUNCIONES_H_
 
-
+void Saludo (void);
 void ImprimirMensajeGanador(char* nombre);
 void ImprimirMensajeNoGanador(void);
 void ImprimirError (void);

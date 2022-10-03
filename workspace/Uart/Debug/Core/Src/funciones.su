@@ -1,3 +1,4 @@
-../Core/Src/funciones.c:13:6:ImprimirMensajeGanador	16	static
-../Core/Src/funciones.c:50:6:ImprimirMensajeNoGanador	8	static
-../Core/Src/funciones.c:69:6:ImprimirError	8	static
+../Core/Src/funciones.c:14:6:Saludo	8	static
+../Core/Src/funciones.c:31:6:ImprimirMensajeGanador	16	static
+../Core/Src/funciones.c:68:6:ImprimirMensajeNoGanador	8	static
+../Core/Src/funciones.c:87:6:ImprimirError	8	static
