@@ -10,5 +10,12 @@
 
 void Saludo (void);
 void ImprimirError (void);
+void Help(void);
+void Ledc(void);
+void Lfsr(void);
+void Time(void);
+void Temp(void);
+void Rege(void);
+void Prin(void);
 
 #endif /* INC_FUNCIONES_H_ */

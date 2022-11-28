@@ -1,2 +1,9 @@
 ../Core/Src/funciones.c:15:6:Saludo	8	static
 ../Core/Src/funciones.c:32:6:ImprimirError	8	static
+../Core/Src/funciones.c:43:6:Help	8	static
+../Core/Src/funciones.c:55:6:Ledc	8	static
+../Core/Src/funciones.c:64:6:Lfsr	8	static
+../Core/Src/funciones.c:73:6:Time	8	static
+../Core/Src/funciones.c:80:6:Temp	8	static
+../Core/Src/funciones.c:87:6:Rege	8	static
+../Core/Src/funciones.c:96:6:Prin	8	static

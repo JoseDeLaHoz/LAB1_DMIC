@@ -57,6 +57,8 @@ static void MX_TIM2_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+
+
 /* USER CODE END 0 */
 
 /**
@@ -66,6 +68,7 @@ static void MX_TIM2_Init(void);
 int main(void)
 {
 	/* USER CODE BEGIN 1 */
+
 
 	/* USER CODE END 1 */
 
@@ -104,7 +107,12 @@ int main(void)
 	char saludo[] = "jhan";
 	char help[] = "help";
 	char temp[] = "temp";
-	char led[] = "led";
+	char ledc[] = "ledc";
+	char lfsr[] = "lfsr";
+	char time[] = "time";
+	char rege[] = "rege";
+	char prin[] = "prin";
+
 	uint8_t i = 0;
 
 	while (1)
@@ -166,6 +174,39 @@ int main(void)
 					  printf(" %d\n",strlen(help));
 					  printf(" %d\n",strlen((char*)buff));
 
+
+					  if((buff[5]==0)&&(buff[6]==0)){
+						  Help();
+					  }
+
+					  if((buff[5]=='l')&&(buff[6]==0x65)&&(buff[7]==0x6d)&&(buff[8]==0x70)){
+						  Temp();
+					  }
+
+					  if((buff[5]==0x6c)&&(buff[6]==0x65)&&(buff[7]==0x64)&&(buff[8]==0x63)){
+						  Ledc();
+					  }
+
+					  if((buff[5]==0x6c)&&(buff[6]==0x66)&&(buff[7]==0x73)&&(buff[8]==0x72)){
+						  Lfsr();
+					  }
+
+					  if((buff[5]==0x74)&&(buff[6]==0x69)&&(buff[7]==0x6d)&&(buff[8]==0x65)){
+						  Time();
+					  }
+
+					  if((buff[5]==0x72)&&(buff[6]==0x65)&&(buff[7]==0x67)&&(buff[8]==0x65)){
+						  Rege();
+					  }
+
+					  if((buff[5]==0x70)&&(buff[6]==0x72)&&(buff[7]==0x69)&&(buff[8]==0x6e)){
+						  Prin();
+					  }
+
+
+
+
+
 					  for(int w = 0; w<sizeof(buff); w++){
 					  					 			buff[w]=0;}
 
@@ -176,6 +217,8 @@ int main(void)
 					  printf(" %d\n",strlen(temp));
 					  printf(" %d\n",strlen((char*)buff));
 
+					  //PONER LA FUNCION PARA LEER TEMPERATURA, YA QUE ACÁ NO SE RECIBE PARÁMETRO//
+
 					  for(int w = 0; w<sizeof(buff); w++){
 													buff[w]=0;
 
@@ -183,13 +226,81 @@ int main(void)
 
 				  }
 
-				  else if(!memcmp(buff,led,strlen(led))){
+				  else if(!memcmp(buff,ledc,strlen(ledc))){
 					  printf("es led\n\r");
-					  printf(" %d\n",strlen(led));
+					  printf(" %d\n",strlen(ledc));
 					  printf(" %d\n",strlen((char*)buff));
+
+					  //PONER LA FUNCIÓN PARA CONFIGURAR LA FRECUANCIA DEL LED//
+
+
+					  if((buff[5]== 0x6f) && (buff[6]== 0x6e)){
+						  HAL_GPIO_WritePin(GPIOB, LED_Pin, GPIO_PIN_SET);
+					  }
+
+					  if((buff[5] == 0x6f) && (buff[6]==0x66)){
+						  HAL_GPIO_WritePin(GPIOB, LED_Pin, GPIO_PIN_RESET);
+					  }
+
 
 					  for(int w = 0; w<sizeof(buff); w++){
 												buff[w]=0;}
+
+				  }
+
+
+
+
+				  else if(!memcmp(buff,lfsr,strlen(lfsr))){
+					  printf("es led\n\r");
+					  printf(" %d\n",strlen(lfsr));
+					  printf(" %d\n",strlen((char*)buff));
+
+
+
+					  for(int w = 0; w<sizeof(buff); w++){
+					  							buff[w]=0;}
+
+				  }
+
+
+
+				  else if(!memcmp(buff,time,strlen(time))){
+				 		printf("es led\n\r");
+				 		printf(" %d\n",strlen(time));
+				 		printf(" %d\n",strlen((char*)buff));
+
+
+
+				 		for(int w = 0; w<sizeof(buff); w++){
+				 					  			buff[w]=0;}
+
+				  }
+
+
+				  else if(!memcmp(buff,rege,strlen(rege))){
+				  	printf("es led\n\r");
+				  	printf(" %d\n",strlen(rege));
+				  	printf(" %d\n",strlen((char*)buff));
+
+
+
+				  	for(int w = 0; w<sizeof(buff); w++){
+				  				 			buff[w]=0;}
+
+				  }
+
+
+
+				  else if(!memcmp(buff,prin,strlen(prin))){
+				  	printf("es led\n\r");
+				  	printf(" %d\n",strlen(prin));
+				  	printf(" %d\n",strlen((char*)buff));
+
+
+
+				  	for(int w = 0; w<sizeof(buff); w++){
+				  				 			buff[w]=0;}
 
 				  }
 
