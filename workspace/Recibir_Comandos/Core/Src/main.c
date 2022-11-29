@@ -19,6 +19,9 @@
 #include "retarget.h"
 #include "funciones.h"
 
+	uint8_t tx_int[2]={0};
+	uint8_t buf_int[2]={0};
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,6 +59,265 @@ static void MX_TIM2_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void Lfsr(void){
+
+				char buf_lfsr[10];
+				uint8_t receive[32] = { 0 }; // Arreglo para recibir
+				uint8_t seed[32] = { 0 };	//Arreglo semilla
+				uint8_t seed_init[32] = { 0 }; //Arreglo semilla inicial
+				uint8_t pol[32] = { 0 }; // Almacenar polinomio
+				uint8_t aux[32] = { 0 }; // Auxiliar para invertir
+				uint8_t xor[32] = { 0 }; // Almacena las xor
+				uint8_t buffer_lfsr[16]={0};	//Transmitir
+				uint8_t band = 1;		//bandera de ciclo max
+				uint8_t tx_int[2]={0};
+				uint8_t buf_int[2]={0};
+
+
+
+
+
+
+
+
+
+				//Mensaje de saludo
+				Saludo();
+
+				//Etiqueta para reiniciar
+
+				printf("\n\rNumero de bits termino de realimentacion\n\r");
+				scanf("%s", buf_lfsr);
+				int numbits = atoi(buf_lfsr);
+				printf("\n\rNumero de bits - Decimals: %d\n\r", numbits);
+
+				printf("\n\rIngrese el polinomio de %d bits en binario\n\r", numbits);
+				if (!HAL_UART_Receive(&huart3, (uint8_t*) receive, numbits,
+						HAL_MAX_DELAY)) {
+
+					for (int i = 0; (i < numbits); i++) {
+						pol[i] = (receive[i] - 48);
+					}
+				}
+
+
+				///////////
+
+			printf("\n\rIngrese el numero de la semilla de %d bits en binario\n\r",
+					numbits);
+			if (!HAL_UART_Receive(&huart3, (uint8_t*) receive, numbits, HAL_MAX_DELAY)) {
+
+				//Recibe una semilla del tamaño de bits anteriormente especificado en binario
+				for (int i = 0; (i < numbits); i++) {
+					seed[i] = (receive[i] - 48);
+					seed_init[i] = seed[i];
+				}
+				band = 1;
+				//Convertir de arreglo a byte
+				uint64_t usr = 0;
+				for (int i = 0; (i < numbits); i++) {
+					usr = usr + pow(2, ((numbits - 1) - i)) * seed_init[i];
+				}
+
+				uint64_t taps = 0;
+				for (int i = 0; (i < numbits); i++) {
+					taps = taps + pow(2, (numbits-1)-i) * pol[(numbits-1)-i];
+				}
+
+
+				printf("\n\r\n\r***************************************************************");
+				printf("\n\r\t*\t RESUMEN INICIAL DE LA SECUENCIA \t*\n\r");
+				printf("***************************************************************");
+				printf("\n\rNumero de bits termino de realimentacion: %d \n\r",numbits);
+				printf("Funcion de realimentacion: BIN ");
+
+				printf("\n\rNumero de bits termino de realimentacion: %d \n\r",numbits);
+				printf("Funcion de realimentacion; ");
+				itoa(taps, (char*) buffer_lfsr, 2);
+				printf("%s", buffer_lfsr);
+				printf(" - ");
+				itoa(taps, (char*) buffer_lfsr, 16);
+				printf("%s", buffer_lfsr);
+
+				printf("\n\rValor inicial - Semilla : ");
+				itoa(usr, (char*) buffer_lfsr, 2);
+				printf("%s", buffer_lfsr);
+				printf(" - ");
+				itoa(usr, (char*) buffer_lfsr, 16);
+				printf("%s", buffer_lfsr);
+
+				uint64_t a = pow(2,numbits)-1;
+				printf("\n\rTotal de numeros esperados en la secuencia: %llu ", a);
+				printf("\r\n");
+
+			}
+
+			printf("\n\r");
+			//////////////////////////////////////////////////////
+			//Invertir el polinomio de acuerdo con los parámetros establecidos
+				for (int w = 0; w < numbits; w++) {
+					aux[w] = pol[numbits - 1 - w];
+				}
+
+				for (int w = 0; w < numbits; w++) {
+					pol[w] = aux[w];
+				}
+
+			uint64_t k = 0;
+			while (k < pow(2, numbits)) {
+
+
+
+				for (int i = 0; (i < numbits); i++) {
+					if (pol[i] == 1) {
+						xor[i] = seed[i];
+					} else {
+						xor[i] = 0;
+					}
+				}
+				////////////////////////////////////////////////////////
+
+				/////////////////////////////////////////////////////////////////////////////////
+				//Determinar cuantos 1's tiene
+				uint64_t res = 0;
+				for (int i = 0; (i < numbits); i++) {
+					res = res + xor[i];
+				}
+				///////////////////////////////////////////////////////////////////////////////////
+
+				// Función utilizada en DEBUGG
+				// HAL_UART_Transmit(&huart3, &res, sizeof(res), HAL_MAX_DELAY);//envia el valor de la suma para determinar valor XOR
+
+				////////DETERMINAMOS SI ES PAR O IMPAR////////////////////////////////
+
+				if (res % 2 == 0) {
+					res = 0;
+				} else {
+					res = 1;
+				}
+				///////////////////////////////////////////////
+				// HAL_UART_Transmit(&huart3, &res, sizeof(res), HAL_MAX_DELAY);
+
+				///mover y poner el valor xor en la cabeza
+				for (int i = numbits - 1; i > 0; i--) {
+					seed[i] = seed[i - 1];
+				}
+
+				seed[0] = res;
+
+				uint64_t usr = 0;
+				for (int i = 0; (i < numbits); i++) {
+					usr = usr + pow(2, ((numbits - 1) - i)) * seed[i];
+				}
+				// Línea equivalente al anterior ciclo pero con tamaño de 4 bits
+				//int usr = 16 * seed[0] + 8 * seed[1] + 4 * seed[2] + 2 * seed[3] + seed[4];
+
+
+				//itoa(usr, (char*) buffer_lfsr, 16);
+				//printf("\n\r%s", buffer_lfsr);
+
+				if(HAL_GPIO_ReadPin (GPIOC, btn_Pin)){
+					printf("\n\r\n\r***************************************************************");
+					printf("\n\r\t*\t DETENER LA SECUENCIA POR EL USUARIO\t*\n\r");
+					printf("***************************************************************");
+					HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+					goto last;
+				}
+
+
+				if (band == 1) {
+					band = 2;
+				} else {
+					band = 0;
+					for (int i = 0; i < numbits; i++) {
+						if (seed[i] != seed_init[i]) {
+							band = 2;
+						}
+					}
+				}
+
+				if (band == 0) {
+					if (k == pow(2, numbits) - 2) {
+						printf("\n\rMAXIMO\n\r");
+					} else {
+						printf("\n\rNO MAX\n\r");
+					}
+					break;
+				}
+				if (band == 2 && k== pow(2, numbits) - 1) {
+					printf("\n\rNO MAX\n\r");
+				}
+				k++;
+			}
+			last:
+			printf("\n\r\n\r***************************************************************");
+			printf("\n\r\t*\t RESUMEN FINAL DE LA SECUENCIA \t*\n\r");
+			printf("***************************************************************");
+			printf("\n\rNumero de bits termino de realimentacion: %d \n\r",numbits);
+			printf("Funcion de realimentacion: BIN ");
+
+			uint64_t usr = 0;
+			for (int i = 0; (i < numbits); i++) {
+				usr = usr + pow(2, ((numbits - 1) - i)) * seed_init[i];
+			}
+
+			uint64_t taps = 0;
+			for (int i = 0; (i < numbits); i++) {
+				taps = taps + pow(2, (numbits-1)-i) * pol[(numbits-1)-i];
+			}
+			/*
+			for (int i = 0; (i < numbits); i++) {
+						usr = usr + pow(2, ((numbits - 1) - i)) * seed_init[i];
+					}
+
+			for (int w = 0; w < numbits; w++) {
+					aux[w] = pol[numbits - 1 - w];
+				}
+
+				for (int w = 0; w < numbits; w++) {
+					pol[w] = aux[w];
+				}
+			 */
+			itoa(taps, (char*) buffer_lfsr, 2);
+			printf("%s", buffer_lfsr);
+			printf(" - HEX ");
+			itoa(taps, (char*) buffer_lfsr, 16);
+			printf("%s", buffer_lfsr);
+
+			printf("\n\rValor inicial - Semilla : ");
+			itoa(usr, (char*) buffer_lfsr, 2);
+			printf("%s", buffer_lfsr);
+			printf(" - ");
+			itoa(usr, (char*) buffer_lfsr, 16);
+			printf("%s", buffer_lfsr);
+
+
+			printf("\n\rNumero de valores calculados en la secuencia: %llu ", k+1);
+			if (band == 0) {
+				if (k == pow(2, numbits) - 2) {
+					HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+					printf("\n\rMAXIMO\n\r");
+				} else {
+					HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+					printf("\n\rNO MAX\n\r");
+				}
+			}
+			if (band == 2 && k== pow(2, numbits) - 1) {
+				HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+				printf("\n\rNO MAX\n\r");
+			}
+			printf("\n\r***************************************************************\n\r");
+
+
+
+
+			}
+			//goto init;
+			//HAL_UART_Transmit(&huart3, seed, 16, HAL_MAX_DELAY);
+			//HAL_UART_Transmit(&huart3, &seed[0], 1, HAL_MAX_DELAY);
+			//HAL_UART_Transmit(&huart3, &seed[1], 1, HAL_MAX_DELAY);
+			//HAL_UART_Transmit(&huart3, &seed[2], 1, HAL_MAX_DELAY);
+			//HAL_UART_Transmit(&huart3, &seed[3], 1, HAL_MAX_DELAY);
 
 
 
@@ -101,8 +363,12 @@ int main(void)
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
+
+
+
+
 	uint8_t rx[2]={0};
-	uint8_t buff[100]={0};
+	uint8_t buffin[100]={0};
 
 	char saludo[] = "jhan";
 	char help[] = "help";
@@ -117,197 +383,183 @@ int main(void)
 
 	while (1)
 	{
-		/*while(rx[0] != 0x0A){
-			  HAL_UART_Receive(&huart3, rx, 1, HAL_MAX_DELAY);
-			  buff[i]=rx[0];
-			  i++;
-		  }
-
-		  HAL_UART_Transmit(&huart3, buff, i, HAL_MAX_DELAY);
-		  i=0;
-		  rx[0]=0;
-
-
-		  for(int k = 0; k<strlen((char*)buff); k++){
-			  if(buff[k]==saludo[k]){
-				 // printf(" %c\n",saludo[k]);
-				 // printf(" %d\n",strlen((char*)buff));
-				  printf(" %d\n",k);
-			  }
-			  else{
-
-				  for(int w = 0; w<strlen((char*)buff); w++){
-				  		  			  buff[w]=0;
-
-
-				  		  		  }
-
-			  }
-		  } */
 
 //////////////////////////RECIBIMOS EL TECLADO/////////////////////////
 				while(rx[0] != 0x0A){
 					  HAL_UART_Receive(&huart3, rx, 1, HAL_MAX_DELAY);
-					  buff[i]=rx[0];
+					  buffin[i]=rx[0];
 					  i++;
 				  }
 //////////////////////////TRANSMITIMOS LO QUE RECIBIMOS DEL TECLADO, SOLO PARA PROBAR, LUEGO SE QUITA//////
-				  HAL_UART_Transmit(&huart3, buff, i, HAL_MAX_DELAY);
+				  HAL_UART_Transmit(&huart3, buffin, i, HAL_MAX_DELAY);
 				  i=0;
 				  rx[0]=0;
 //////////////////////DETERMINAMOS QUÉ COMANDO RECIBIMOS////////////////
 				  /////FALTA PONER LA PARTE DE PROCESAR EL PARÁMETRO
 				  ///// ES SOLO PARA TENER LISTA LA PARTE DE TERMINAR COMANDOS
-				  if(!memcmp(buff,saludo,strlen(saludo))){
+				  if(!memcmp(buffin,saludo,strlen(saludo))){
 
 					  printf("es saludo\n\r");
 					  printf(" %d\n",strlen(saludo));
-					  printf(" %d\n",strlen((char*)buff));
+					  printf(" %d\n",strlen((char*)buffin));
 
-					  for(int w = 0; w<sizeof(buff); w++){
-					 				  		  			  buff[w]=0;}
+					  for(int w = 0; w<sizeof(buffin); w++){
+					 				  		  			  buffin[w]=0;}
 				  }
 
 
-				  else if(!memcmp(buff,help,strlen(help))){
+				  else if(!memcmp(buffin,help,strlen(help))){
 					  printf("es help\n\r");
 					  printf(" %d\n",strlen(help));
-					  printf(" %d\n",strlen((char*)buff));
+					  printf(" %d\n",strlen((char*)buffin));
 
 
-					  if((buff[5]==0)&&(buff[6]==0)){
+					  if((buffin[5]==0)&&(buffin[6]==0)){
 						  Help();
 					  }
 
-					  if((buff[5]=='l')&&(buff[6]==0x65)&&(buff[7]==0x6d)&&(buff[8]==0x70)){
-						  Temp();
+					  if((buffin[5]=='t')&&(buffin[6]==0x65)&&(buffin[7]==0x6d)&&(buffin[8]==0x70)){
+						  H_Temp();
 					  }
 
-					  if((buff[5]==0x6c)&&(buff[6]==0x65)&&(buff[7]==0x64)&&(buff[8]==0x63)){
-						  Ledc();
+					  if((buffin[5]=='l')&&(buffin[6]=='e')&&(buffin[7]=='d')&&(buffin[8]=='c')){
+						  H_Ledc();
 					  }
 
-					  if((buff[5]==0x6c)&&(buff[6]==0x66)&&(buff[7]==0x73)&&(buff[8]==0x72)){
-						  Lfsr();
+					  if((buffin[5]=='l')&&(buffin[6]=='f')&&(buffin[7]=='s')&&(buffin[8]=='r')){
+						  H_Lfsr();
 					  }
 
-					  if((buff[5]==0x74)&&(buff[6]==0x69)&&(buff[7]==0x6d)&&(buff[8]==0x65)){
-						  Time();
+					  if((buffin[5]==0x74)&&(buffin[6]==0x69)&&(buffin[7]==0x6d)&&(buffin[8]==0x65)){
+						  H_Time();
 					  }
 
-					  if((buff[5]==0x72)&&(buff[6]==0x65)&&(buff[7]==0x67)&&(buff[8]==0x65)){
-						  Rege();
+					  if((buffin[5]==0x72)&&(buffin[6]==0x65)&&(buffin[7]==0x67)&&(buffin[8]==0x65)){
+						  H_Rege();
 					  }
 
-					  if((buff[5]==0x70)&&(buff[6]==0x72)&&(buff[7]==0x69)&&(buff[8]==0x6e)){
-						  Prin();
+					  if((buffin[5]==0x70)&&(buffin[6]==0x72)&&(buffin[7]==0x69)&&(buffin[8]==0x6e)){
+						  H_Prin();
 					  }
 
 
 
 
 
-					  for(int w = 0; w<sizeof(buff); w++){
-					  					 			buff[w]=0;}
+					  for(int w = 0; w<sizeof(buffin); w++){
+					  					 			buffin[w]=0;}
 
 				  }
 
-				  else if(!memcmp(buff,temp,strlen(temp))){
+				  else if(!memcmp(buffin,temp,strlen(temp))){
 					  printf("es temp\n\r");
 					  printf(" %d\n",strlen(temp));
-					  printf(" %d\n",strlen((char*)buff));
+					  printf(" %d\n",strlen((char*)buffin));
 
 					  //PONER LA FUNCION PARA LEER TEMPERATURA, YA QUE ACÁ NO SE RECIBE PARÁMETRO//
 
-					  for(int w = 0; w<sizeof(buff); w++){
-													buff[w]=0;
+					  for(int w = 0; w<sizeof(buffin); w++){
+													buffin[w]=0;
 
 					  }
 
 				  }
 
-				  else if(!memcmp(buff,ledc,strlen(ledc))){
+				  else if(!memcmp(buffin,ledc,strlen(ledc))){
 					  printf("es led\n\r");
 					  printf(" %d\n",strlen(ledc));
-					  printf(" %d\n",strlen((char*)buff));
+					  printf(" %d\n",strlen((char*)buffin));
 
 					  //PONER LA FUNCIÓN PARA CONFIGURAR LA FRECUANCIA DEL LED//
 
 
-					  if((buff[5]== 0x6f) && (buff[6]== 0x6e)){
+					  if((buffin[5]== 'o') && (buffin[6]== 'n')){
 						  HAL_GPIO_WritePin(GPIOB, LED_Pin, GPIO_PIN_SET);
 					  }
 
-					  if((buff[5] == 0x6f) && (buff[6]==0x66)){
+					  if((buffin[5] == 'o') && (buffin[6]=='f')){
 						  HAL_GPIO_WritePin(GPIOB, LED_Pin, GPIO_PIN_RESET);
 					  }
 
 
-					  for(int w = 0; w<sizeof(buff); w++){
-												buff[w]=0;}
+					  for(int w = 0; w<sizeof(buffin); w++){
+												buffin[w]=0;}
 
 				  }
 
 
 
 
-				  else if(!memcmp(buff,lfsr,strlen(lfsr))){
-					  printf("es led\n\r");
+				  else if(!memcmp(buffin,lfsr,strlen(lfsr))){
+					  printf("es lfsr\n\r");
 					  printf(" %d\n",strlen(lfsr));
-					  printf(" %d\n",strlen((char*)buff));
+					  printf(" %d\n",strlen((char*)buffin));
+
+					  if(buffin[5]=='x'){
+
+						 Lfsr();
+
+					  }
+
+					  if(buffin[5]=='p'){
+						  printf("es lfsr con pagina\n\r");
+					  }
 
 
 
-					  for(int w = 0; w<sizeof(buff); w++){
-					  							buff[w]=0;}
+					  for(int w = 0; w<sizeof(buffin); w++){
+					  							buffin[w]=0;}
 
 				  }
 
 
 
-				  else if(!memcmp(buff,time,strlen(time))){
-				 		printf("es led\n\r");
+				  else if(!memcmp(buffin,time,strlen(time))){
+					  	  uint64_t r =0;
+					  	  r = pow(2,32);
+				 		printf("es time\n\r");
 				 		printf(" %d\n",strlen(time));
-				 		printf(" %d\n",strlen((char*)buff));
+				 		printf(" %d\n",strlen((char*)buffin));
+				 		printf(" %llu",r);
 
 
 
-				 		for(int w = 0; w<sizeof(buff); w++){
-				 					  			buff[w]=0;}
+				 		for(int w = 0; w<sizeof(buffin); w++){
+				 					  			buffin[w]=0;}
 
 				  }
 
 
-				  else if(!memcmp(buff,rege,strlen(rege))){
-				  	printf("es led\n\r");
+				  else if(!memcmp(buffin,rege,strlen(rege))){
+				  	printf("es rege\n\r");
 				  	printf(" %d\n",strlen(rege));
-				  	printf(" %d\n",strlen((char*)buff));
+				  	printf(" %d\n",strlen((char*)buffin));
 
 
 
-				  	for(int w = 0; w<sizeof(buff); w++){
-				  				 			buff[w]=0;}
+				  	for(int w = 0; w<sizeof(buffin); w++){
+				  				 			buffin[w]=0;}
 
 				  }
 
 
 
-				  else if(!memcmp(buff,prin,strlen(prin))){
-				  	printf("es led\n\r");
+				  else if(!memcmp(buffin,prin,strlen(prin))){
+				  	printf("es prin\n\r");
 				  	printf(" %d\n",strlen(prin));
-				  	printf(" %d\n",strlen((char*)buff));
+				  	printf(" %d\n",strlen((char*)buffin));
 
 
 
-				  	for(int w = 0; w<sizeof(buff); w++){
-				  				 			buff[w]=0;}
+				  	for(int w = 0; w<sizeof(buffin); w++){
+				  				 			buffin[w]=0;}
 
 				  }
 
 				  else{
 					  printf("ningun comando\n\r");
-					  for(int w = 0; w<sizeof(buff); w++){
-					 				  		  			  buff[w]=0;}
+					  for(int w = 0; w<sizeof(buffin); w++){
+					 				  		  			  buffin[w]=0;}
 				  }
 
 
@@ -436,7 +688,7 @@ static void MX_USART3_UART_Init(void)
 
 	/* USER CODE END USART3_Init 1 */
 	huart3.Instance = USART3;
-	huart3.Init.BaudRate = 115200;
+	huart3.Init.BaudRate = 921600;
 	huart3.Init.WordLength = UART_WORDLENGTH_8B;
 	huart3.Init.StopBits = UART_STOPBITS_1;
 	huart3.Init.Parity = UART_PARITY_NONE;

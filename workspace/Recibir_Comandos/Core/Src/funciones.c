@@ -52,7 +52,7 @@ void Help(void) {
 	printf("\r\n");
 }
 
-void Ledc(void){
+void H_Ledc(void){
 	printf("\n\r Hace titilar un led a una velocidad configurable.");
 	printf("\n\r ledcontrol <argumento>");
 	printf("\n\r\t    argumento\t determina la frecuencia de encendido y apagado del led (0.1, 0.2,..., 1,.., 10) Hz");
@@ -61,30 +61,23 @@ void Ledc(void){
 }
 
 
-void Lfsr(void){
-	printf("\n\r Genera una secuencia de nÃºmeros pseudoaleatorios.");
-	printf("\n\r LFSR <argumento>");
-	printf("\n\r\t argumento:\t permite escoger el algoritmo de generaciÃ³n de la secuencia de nÃºmeros");
-	printf("\n\r\t\t x genera la secuencia de nÃºmeros con la tÃ©cnica de XOR's");
-	printf("\n\r\t\t p genera la secuencia de nÃºmeros con la tÃ©cnica dada por la pÃ¡gina");
-	printf("\r\n");
-}
 
-void Time(void){
+
+void H_Time(void){
 	printf("\n\r Toma la fecha y hora del RTC y lo presenta en pantalla.");
 	printf("\n\r\t tiempo [vacio]");
 	printf("\n\r\t\t  este comando no requiere de un argumentos");
 	printf("\r\n");
 }
 
-void Temp(void){
+void H_Temp(void){
 	printf("\n\r Toma la temperatura del perifÃ©rico de la tarjeta nÃºcleo y la presenta en la terminal.");
 	printf("\n\r\t temp [vacio]");
 	printf("\n\r\t\t este comando no requiere de un argumentos");
 	printf("\r\n");
 }
 
-void Rege(void){
+void H_Rege(void){
 	printf("\n\r Permite gestionar los registros de ejecuciÃ³n almacenados en la memoria no volÃ¡til.");
 	printf("\n\r\t rege <argumento>");
 	printf("\n\r\t\t    r  permite leer los datos guardados en los registros");
@@ -93,12 +86,21 @@ void Rege(void){
 	printf("\r\n");
 }
 
-void Prin(void){
+void H_Prin(void){
 	printf("\n\r Permite determinar si durante la ejecuciÃ³n de al secuencia pseudoaleatoria se imprimen");
 	printf("\n\r los nÃºmeros o solo se indica que se estÃ¡ corriendo la secuencia.");
 	printf("\n\r\t impresion <argumento>");
 	printf("\n\r\t\t    d deshabilita la impresiÃ³n de los nÃºmeros de la secuencia y emite una seÃ±al de ejecuciÃ³n");
 	printf("\n\r\t\t    e  habilita la impresiÃ³n de los nÃºmeros de la secuencia");
+	printf("\r\n");
+}
+
+void H_Lfsr(void){
+	printf("\n\r Genera una secuencia de números pseudoaleatorios.");
+	printf("\n\r LFSR <argumento>");
+	printf("\n\r\t argumento:\t permite escoger el algoritmo de generación de la secuencia de números");
+	printf("\n\r\t\t x genera la secuencia de números con la técnica de XOR's");
+	printf("\n\r\t\t p genera la secuencia de números con la técnica dada por la página");
 	printf("\r\n");
 }
 
