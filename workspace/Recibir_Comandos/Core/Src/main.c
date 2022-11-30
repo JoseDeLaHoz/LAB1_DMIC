@@ -73,8 +73,6 @@ void Lfsr(void){
 				uint8_t xor[32] = { 0 }; // Almacena las xor
 				uint8_t buffer_lfsr[16]={0};	//Transmitir
 				uint8_t band = 1;		//bandera de ciclo max
-				uint8_t tx_int[2]={0};
-				uint8_t buf_int[2]={0};
 
 
 
@@ -216,8 +214,8 @@ void Lfsr(void){
 				//int usr = 16 * seed[0] + 8 * seed[1] + 4 * seed[2] + 2 * seed[3] + seed[4];
 
 
-				//itoa(usr, (char*) buffer_lfsr, 16);
-				//printf("\n\r%s", buffer_lfsr);
+				itoa(usr, (char*) buffer_lfsr, 16);
+				printf("\n\r%s", buffer_lfsr);
 
 				if(HAL_GPIO_ReadPin (GPIOC, btn_Pin)){
 					printf("\n\r\n\r***************************************************************");
