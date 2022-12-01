@@ -8,6 +8,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <string.h>
+
 //Adición de librerías para
 // transmisión UART stdio y string
 
@@ -125,6 +126,8 @@ void Lfsr(void){
 					taps = taps + pow(2, (numbits-1)-i) * pol[(numbits-1)-i];
 				}
 
+				HAL_UART_Receive_IT(&huart3, tx_int, 1);
+
 
 				printf("\n\r\n\r***************************************************************");
 				printf("\n\r\t*\t RESUMEN INICIAL DE LA SECUENCIA \t*\n\r");
@@ -217,12 +220,18 @@ void Lfsr(void){
 				itoa(usr, (char*) buffer_lfsr, 16);
 				printf("\n\r%s", buffer_lfsr);
 
-				if(HAL_GPIO_ReadPin (GPIOC, btn_Pin)){
+
+
+				if(buf_int[0] == 0x1b){
 					printf("\n\r\n\r***************************************************************");
 					printf("\n\r\t*\t DETENER LA SECUENCIA POR EL USUARIO\t*\n\r");
 					printf("***************************************************************");
 					HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
 					goto last;
+				}
+
+				if(buf_int[0] != 0x1b){
+					HAL_UART_Receive_IT(&huart3, tx_int, 1);
 				}
 
 
@@ -366,6 +375,7 @@ void Temp(void){
 					  }
 
 }
+
 
 
 
@@ -546,8 +556,10 @@ int main(void)
 					  printf(" %d\n",strlen((char*)buffin));
 
 					  if(buffin[5]=='x'){
+						  buf_int[0] = 0;
 
-						 Lfsr();
+						  Lfsr();
+
 
 					  }
 
@@ -839,7 +851,12 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+    buf_int[0]=tx_int[0];
 
+
+}
 /* USER CODE END 4 */
 
 /**
