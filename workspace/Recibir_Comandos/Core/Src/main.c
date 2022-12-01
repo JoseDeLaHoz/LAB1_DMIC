@@ -22,6 +22,7 @@
 
 	uint8_t tx_int[2]={0};
 	uint8_t buf_int[2]={0};
+	uint8_t prnt = 0;
 
 /* USER CODE END Includes */
 
@@ -216,10 +217,10 @@ void Lfsr(void){
 				// Línea equivalente al anterior ciclo pero con tamaño de 4 bits
 				//int usr = 16 * seed[0] + 8 * seed[1] + 4 * seed[2] + 2 * seed[3] + seed[4];
 
-
+				if(prnt == 1){
 				itoa(usr, (char*) buffer_lfsr, 16);
 				printf("\n\r%s", buffer_lfsr);
-
+				}
 
 
 				if(buf_int[0] == 0x1b){
@@ -611,7 +612,15 @@ int main(void)
 				  	printf(" %d\n",strlen(prin));
 				  	printf(" %d\n",strlen((char*)buffin));
 
+				  	if(buffin[5]=='e'){
+				  	prnt = 1;
+				  	printf("Mostrar secuencia Habilitado\n\r");
+				  	}
 
+				  	if(buffin[5]=='d'){
+					prnt = 0;
+					printf("Mostrar secuencia Deshabilitado\n\r");
+					}
 
 				  	for(int w = 0; w<sizeof(buffin); w++){
 				  				 			buffin[w]=0;}
